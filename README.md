@@ -1,0 +1,2 @@
+# Yelp Review Categorisation
+Here, I tried to find out the relationship between the user's text review and their given star ratings in any business profile, taking the Yelp review dataset as an example. I first created a corpus from the whole document by using lemmatization and then further removing the common words namely 'stopwords' from the text document along with some useless expressional words which occur very less. Then using the corpus, I used four different classifiers and compared the results among themselves.
