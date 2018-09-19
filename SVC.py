@@ -88,9 +88,18 @@ with open('corpus.pkl', 'wb') as fp:
 #del corpus
 gc.collect()
 
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 0)
+
+from sklearn.preprocessing import StandardScaler #only for SVC
+sc = StandardScaler()
+X_train = sc.fit_transform(X_train).astype(dtype='float32',copy=False)
+X_test = sc.transform(X_test).astype(dtype='float32',copy=False)
+gc.collect()
+
 from imblearn.over_sampling import SMOTE 
 sm = SMOTE(random_state=0,n_jobs=-1) 
-X_resampled, y_resampled = sm.fit_sample(X, y)
+X_resampled, y_resampled = sm.fit_sample(X_train, y_train)
 X_resampled = X_resampled.astype(dtype='float32',copy=False)
 gc.collect()
 
@@ -105,20 +114,11 @@ plt.pie(values,labels=labels,colors=colors,autopct='%1.2f%%',textprops={'fontsiz
 plt.show()
 gc.collect()
 
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size = 0.25, random_state = 0)
-
-from sklearn.preprocessing import StandardScaler #only for SVC
-sc = StandardScaler()
-X_train = sc.fit_transform(X_train).astype(dtype='float32',copy=False)
-X_test = sc.transform(X_test).astype(dtype='float32',copy=False)
-gc.collect()
-
 from sklearn.svm import SVC
 from sklearn.ensemble import BaggingClassifier
 n_estimators = 10
 classifier = BaggingClassifier(SVC(kernel='rbf',random_state=0), max_samples=1.0 / n_estimators, n_estimators=n_estimators, n_jobs=-1, random_state=0)
-classifier.fit(X_train, y_train)
+classifier.fit(X_resampled, y_resampled)
 y_pred = classifier.predict(X_test)
 
 from sklearn.metrics import accuracy_score, confusion_matrix, mean_squared_error

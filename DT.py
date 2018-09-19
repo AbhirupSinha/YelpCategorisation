@@ -88,9 +88,12 @@ with open('corpus.pkl', 'wb') as fp:
 #del corpus
 gc.collect()
 
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 0)
+
 from imblearn.over_sampling import SMOTE 
 sm = SMOTE(random_state=0,n_jobs=-1) 
-X_resampled, y_resampled = sm.fit_sample(X, y)
+X_resampled, y_resampled = sm.fit_sample(X_train, y_train)
 X_resampled = X_resampled.astype(dtype='float32',copy=False)
 gc.collect()
 
@@ -105,12 +108,9 @@ plt.pie(values,labels=labels,colors=colors,autopct='%1.2f%%',textprops={'fontsiz
 plt.show()
 gc.collect()
 
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size = 0.25, random_state = 0)
-
 from sklearn.tree import DecisionTreeClassifier 
 classifier = DecisionTreeClassifier(criterion='entropy',random_state=0)
-classifier.fit(X_train, y_train)
+classifier.fit(X_resampled, y_resampled)
 y_pred = classifier.predict(X_test)
 
 from sklearn.metrics import accuracy_score, confusion_matrix, mean_squared_error
